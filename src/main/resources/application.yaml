@@ -1,0 +1,31 @@
+server:
+  port: 9100
+
+spring:
+  application:
+    name: geekinvest_users
+  datasource:
+    driver-class-name: org.postgres.Driver
+    url: jdbc:postgresql://localhost:5432/GeekinvestUsers?createDatabaseIfNotExist=true&useSSL=false
+    username: postgres 
+    password: postgres 
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update 
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    url: jdbc:postgresql://localhost:5432
+    schemas: public
+    user: postgres 
+    password: postgres 
+  jackson:
+    default-property-inclusion: NON_NULL
+    serialization:
+      fail-on-empty-beans: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9900/eureka

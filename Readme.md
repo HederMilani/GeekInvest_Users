@@ -1,4 +1,3 @@
+# GeekInvesting - Users
 
-# GeekInvesting - LoadBalance
-
-Loadbalance com Eureka - Spring Boot para gerenciamento de sistema em Microserviço para monitoramento de investimentos.
+Microserviço para gerenciamento de Usuários para sistema GeekInvesting.
