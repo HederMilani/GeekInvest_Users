@@ -8,4 +8,7 @@ import com.api.geekinvest_users.model.Country;
 
 public interface CountryRepositories extends JpaRepository<Country, UUID> {
 	
+	boolean existsByCountryName(String nameCountry);
+	boolean existsBySigla(String sigla);
+	
 }
