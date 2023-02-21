@@ -19,6 +19,11 @@ spring:
     default-property-inclusion: NON_NULL
     serialization:
       fail-on-empty-beans: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: 123456
 
 eureka:
   client:

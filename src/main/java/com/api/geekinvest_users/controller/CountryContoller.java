@@ -1,10 +1,10 @@
 package com.api.geekinvest_users.controller;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.commons.lang.WordUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.api.geekinvest_users.constant.RabbitMQConstant;
 import com.api.geekinvest_users.dto.CountryDto;
 import com.api.geekinvest_users.model.Country;
 import com.api.geekinvest_users.service.CountryService;
+import com.api.geekinvest_users.service.RabbitMQService;
 
 import jakarta.validation.Valid;
 
@@ -40,6 +42,9 @@ public class CountryContoller {
 
 	@Autowired
 	private CountryService service;
+
+	@Autowired
+	private RabbitMQService rabbitMQService;
 
 	@PostMapping
 	public ResponseEntity<Object> createCountry(
@@ -74,6 +79,8 @@ public class CountryContoller {
 				.buildAndExpand(objCountry.getId())
 				.toUri();
 
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_CREATE, objCountry);
+
 		return ResponseEntity.created(uri).body(objCountry);
 	}
 
@@ -94,6 +101,19 @@ public class CountryContoller {
 		return ResponseEntity.status(HttpStatus.OK).body(countryOptional.get());
 	}
 
+	@GetMapping(value = "/name/{countryName}")
+	public ResponseEntity<Object> findByCountryName(@PathVariable(value = "countryName") String countryName) {
+		Optional<Country> countryOptional = service.findByCountryName(countryName);
+
+		if (!countryOptional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Country Not Found!");
+		}
+
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_UPDATE, countryOptional);
+
+		return ResponseEntity.status(HttpStatus.OK).body(countryOptional.get());
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteCountry(@PathVariable(value = "id") UUID id) {
 		Optional<Country> countryOptional = service.findById(id);
@@ -103,6 +123,8 @@ public class CountryContoller {
 		}
 
 		service.delete(countryOptional.get());
+
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_DELETE, countryOptional);
 
 		return ResponseEntity.status(HttpStatus.OK).body("Country deleted Successfully!");
 	}
@@ -129,4 +151,7 @@ public class CountryContoller {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(service.save(objCountry));
 	}
+
+	// TODO Adicionar função para enviar mensagem de atualização para todos os
+	// serviços que possuam Country
 }

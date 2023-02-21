@@ -42,4 +42,8 @@ public class CountryService {
 		repository.delete(country);
 	}
 
+	public Optional<Country> findByCountryName(String countrName) {
+		return repository.findByCountryNameLikeIgnoreCase(countrName);
+	}
+
 }
