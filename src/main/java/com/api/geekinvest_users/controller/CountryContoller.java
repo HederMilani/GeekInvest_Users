@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,12 +31,13 @@ import com.api.geekinvest_users.dto.CountryDto;
 import com.api.geekinvest_users.model.Country;
 import com.api.geekinvest_users.service.CountryService;
 import com.api.geekinvest_users.service.RabbitMQService;
+import com.lib.mq.CountryMq;
 
 import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("geekuser/contry")
+@RequestMapping("geekuser/country")
 public class CountryContoller {
 	private static final Logger LOG = LogManager.getLogger(CountryContoller.class);
 
@@ -44,6 +46,8 @@ public class CountryContoller {
 
 	@Autowired
 	private RabbitMQService rabbitMQService;
+
+	private CountryMq countryMq = new CountryMq();
 
 	@PostMapping
 	public ResponseEntity<Object> createCountry(
@@ -72,13 +76,20 @@ public class CountryContoller {
 					.body("Conflict: Sigla " + objCountry.getSigla() + " already exists!");
 		}
 
+		objCountry.setCountryName(objCountry.getCountryName().toUpperCase());
+		objCountry.setSigla(objCountry.getSigla().toUpperCase());
+
 		objCountry = service.save(objCountry);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
 				.path("/{id}")
 				.buildAndExpand(objCountry.getId())
 				.toUri();
 
-		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_SAVE, objCountry);
+		countryMq.setId(objCountry.getId());
+		countryMq.setCountryName(objCountry.getCountryName());
+		countryMq.setSigla(objCountry.getSigla());
+
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_SAVE, countryMq);
 
 		return ResponseEntity.created(uri).body(objCountry);
 	}
@@ -123,7 +134,8 @@ public class CountryContoller {
 
 		service.delete(countryOptional.get());
 
-		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_DELETE, countryOptional);
+		BeanUtils.copyProperties(countryOptional, countryMq);
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_DELETE, countryMq);
 
 		return ResponseEntity.status(HttpStatus.OK).body("Country deleted Successfully!");
 	}
@@ -145,12 +157,29 @@ public class CountryContoller {
 		BeanUtils.copyProperties(countryDto, objCountry);
 		objCountry.setId(id);
 
-		LOG.info("Country Atualizado: " + objCountry.toString());
+		if (objCountry.getCountryName() == null) {
+			objCountry.setCountryName(optionalCountry.get().getCountryName());
+		}
+		if (objCountry.getSigla() == null) {
+			objCountry.setSigla(optionalCountry.get().getSigla());
+		}
 
+		objCountry.setCountryName(objCountry.getCountryName().toUpperCase());
+		objCountry.setSigla(objCountry.getSigla().toUpperCase());
+
+		if (objCountry.getCountryName().equals(optionalCountry.get().getCountryName())
+				&& objCountry.getSigla().equals(optionalCountry.get().getSigla())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("Not found changes to be processed in Country!");
+		}
+
+		BeanUtils.copyProperties(objCountry, countryMq);
+
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_SAVE, countryMq);
+
+		LOG.info("Country Atualizado: " + objCountry.toString());
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(service.save(objCountry));
 	}
 
-	// TODO Adicionar função para enviar mensagem de atualização para todos os
-	// serviços que possuam Country
 }

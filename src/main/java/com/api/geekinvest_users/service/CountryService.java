@@ -22,11 +22,11 @@ public class CountryService {
 	}	
 
 	public boolean existsByCountryName(String nameCountry) {
-		return repository.existsByCountryName(nameCountry);
+		return repository.existsByCountryNameIgnoreCase(nameCountry);
 	}
 
 	public boolean existsBySigla(String sigla) {
-		return repository.existsBySigla(sigla);
+		return repository.existsBySiglaIgnoreCase(sigla);
 	}
 
 	public Page<Country> findAll(Pageable pageable) {
