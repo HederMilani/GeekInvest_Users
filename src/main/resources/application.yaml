@@ -30,4 +30,8 @@ eureka:
     service-url:
       defaultZone: http://localhost:9900/eureka
 
-
+rabbit:
+  queue:
+    country:
+      save: user.country.save
+      delete: user.country.delete
