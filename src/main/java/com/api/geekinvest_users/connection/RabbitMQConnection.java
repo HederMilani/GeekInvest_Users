@@ -34,24 +34,20 @@ public class RabbitMQConnection {
 
     @PostConstruct
     private void addQueue() {
-        Queue queueCountryCreate = this.queue(RabbitMQConstant.QUEUE_COUNTRY_CREATE);
-        Queue queueCountryUpdate = this.queue(RabbitMQConstant.QUEUE_COUNTRY_UPDATE);
+        Queue queueCountrySave = this.queue(RabbitMQConstant.QUEUE_COUNTRY_SAVE);
         Queue queueCountryDelete = this.queue(RabbitMQConstant.QUEUE_COUNTRY_DELETE);
 
         DirectExchange exchange = this.userExchange();
 
-        Binding relationCountryCreate = this.exchangeQueue(queueCountryCreate, exchange);
-        Binding relationCountryUpdate = this.exchangeQueue(queueCountryUpdate, exchange);
+        Binding relationCountrySave = this.exchangeQueue(queueCountrySave, exchange);
         Binding relationCountryDelete = this.exchangeQueue(queueCountryDelete, exchange);
 
-        this.amqpAdmin.declareQueue(queueCountryCreate);
-        this.amqpAdmin.declareQueue(queueCountryUpdate);
+        this.amqpAdmin.declareQueue(queueCountrySave);
         this.amqpAdmin.declareQueue(queueCountryDelete);
 
         this.amqpAdmin.declareExchange(exchange);
 
-        this.amqpAdmin.declareBinding(relationCountryCreate);
-        this.amqpAdmin.declareBinding(relationCountryUpdate);
+        this.amqpAdmin.declareBinding(relationCountrySave);
         this.amqpAdmin.declareBinding(relationCountryDelete);
 
     }

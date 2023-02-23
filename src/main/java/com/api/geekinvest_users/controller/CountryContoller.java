@@ -78,7 +78,7 @@ public class CountryContoller {
 				.buildAndExpand(objCountry.getId())
 				.toUri();
 
-		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_CREATE, objCountry);
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_SAVE, objCountry);
 
 		return ResponseEntity.created(uri).body(objCountry);
 	}
@@ -108,7 +108,7 @@ public class CountryContoller {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Country Not Found!");
 		}
 
-		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_UPDATE, countryOptional);
+		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_SAVE, countryOptional);
 
 		return ResponseEntity.status(HttpStatus.OK).body(countryOptional.get());
 	}
