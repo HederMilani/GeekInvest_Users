@@ -12,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -113,4 +115,62 @@ public class StateController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(stateOptional);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateState(
+            @PathVariable("id") UUID id,
+            @Valid @RequestBody StateDto stateDto) {
+        LOG.info("Status update: " + stateDto.toString());
+
+        Optional<State> stateOptional = stateService.findById(id);
+
+        if (!stateOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("State not found");
+        }
+
+        if (stateDto.getStateName() != null) {
+            stateOptional.get().setStateName(stateDto.getStateName().toUpperCase());
+        }
+        if (stateDto.getStateUf() != null) {
+            stateOptional.get().setStateUf(stateDto.getStateUf().toUpperCase());
+        }
+        if (stateDto.getCountryName() != null) {
+            Optional<Country> countryOptional = countryService.findByCountryName(stateDto.getCountryName());
+
+            if (!countryOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Country not found");
+            }
+            stateOptional.get().setCountry(countryOptional.get());
+        }
+        if (!stateOptional.get().isStateEnabled()) {
+            stateOptional.get().setStateEnabled(true);
+        }
+
+        stateService.save(stateOptional.get());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stateOptional.get());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteState(@PathVariable("id") UUID id) {
+        LOG.info("Delete State By Id: " + id);
+
+        Optional<State> stateOptional = stateService.findById(id);
+
+        if (!stateOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("State not found");
+        }
+
+        stateOptional.get().setStateEnabled(false);
+
+        stateService.save(stateOptional.get());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stateOptional.get());
+    }
+    
 }

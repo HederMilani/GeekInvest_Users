@@ -22,4 +22,34 @@ public class StateControllerTest {
     void testFindById() {
 
     }
+
+    @Test
+    void testCreateState2() {
+        
+    }
+
+    @Test
+    void testDeleteState() {
+        
+    }
+
+    @Test
+    void testFindAllEnabledStates2() {
+        
+    }
+
+    @Test
+    void testFindAllStates2() {
+        
+    }
+
+    @Test
+    void testFindById2() {
+        
+    }
+
+    @Test
+    void testUpdateState() {
+        
+    }
 }
