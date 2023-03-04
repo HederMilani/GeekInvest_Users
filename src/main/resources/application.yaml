@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: geekinvest_users
+    name: artemis
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:15432/GeekinvestUsers?createDatabaseIfNotExist=true&useSSL=false
+    url: jdbc:postgresql://localhost:15432/Artemis?createDatabaseIfNotExist=true&useSSL=false
     username: postgres 
     password: postgres 
   jpa:
@@ -30,8 +30,3 @@ eureka:
     service-url:
       defaultZone: http://localhost:9900/eureka
 
-rabbit:
-  queue:
-    country:
-      save: user.country.save
-      delete: user.country.delete
