@@ -1,7 +1,9 @@
 package com.api.geekinvest_users.controller;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +29,7 @@ import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @Controller
-@RequestMapping("geekuser/state")
+@RequestMapping("artemis/state")
 public class StateController {
     private static Logger LOG = LogManager.getLogger(StateController.class);
 
@@ -77,5 +81,36 @@ public class StateController {
                 .toUri();
 
         return ResponseEntity.created(uri).body(state);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<State>> findAllStates() {
+        LOG.info("Find all states");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stateService.findAllState());
+    }
+
+    @GetMapping("/enabled")
+    public ResponseEntity<List<State>> findAllEnabledStates() {
+        LOG.info("Find all enabled states");
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stateService.findAllStateEnabled());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> findById(@PathVariable UUID id) {
+        LOG.info("Find State By Id: " + id);
+
+        Optional<State> stateOptional = stateService.findById(id);
+
+        if (!stateOptional.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("State not found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(stateOptional);
     }
 }

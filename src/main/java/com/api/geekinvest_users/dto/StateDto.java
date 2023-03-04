@@ -9,16 +9,18 @@ public class StateDto implements Serializable {
     private UUID id;
     private String stateName;
     private String stateUf;
+    private boolean stateEnabled;
     private String countryName;
 
     public StateDto() {
     }
 
-    public StateDto(UUID id, String stateName, String stateUf, String countryName) {
+    public StateDto(UUID id, String stateName, String stateUf, String countryName, boolean stateEnabled) {
         this.id = id;
         this.stateName = stateName;
         this.stateUf = stateUf;
         this.countryName = countryName;
+        this.stateEnabled = stateEnabled;
     }
 
     public UUID getId() {
@@ -51,6 +53,14 @@ public class StateDto implements Serializable {
 
     public void setCountryName(String countryName) {
         this.countryName = countryName;
+    }
+
+    public boolean isStateEnabled() {
+        return stateEnabled;
+    }
+
+    public void setStateEnabled(boolean stateEnabled) {
+        this.stateEnabled = stateEnabled;
     }
 
     @Override

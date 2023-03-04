@@ -27,6 +27,9 @@ public class State implements Serializable {
 	@Column(nullable = false)
 	private String stateUf;
 
+	@Column(nullable = false)
+	private boolean stateEnabled;
+
 	@JoinColumn
 	@ManyToOne
 	private Country country;
@@ -34,11 +37,12 @@ public class State implements Serializable {
 	public State() {
 	}
 
-	public State(UUID id, String stateName, String stateUf, Country country) {
+	public State(UUID id, String stateName, String stateUf, boolean stateEnabed , Country country) {
 		this.id = id;
 		this.stateName = stateName;
 		this.stateUf = stateUf;
 		this.country = country;
+		this.stateEnabled = stateEnabed;
 	}
 
 	public UUID getId() {
@@ -73,6 +77,14 @@ public class State implements Serializable {
 		this.country = country;
 	}
 
+	public boolean isStateEnabled() {
+        return stateEnabled;
+    }
+
+	public void setStateEnabled(boolean stateEnabled) {
+        this.stateEnabled = stateEnabled;
+    }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -80,6 +92,7 @@ public class State implements Serializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((stateName == null) ? 0 : stateName.hashCode());
 		result = prime * result + ((stateUf == null) ? 0 : stateUf.hashCode());
+		result = prime * result + (stateEnabled ? 1231 : 1237);
 		result = prime * result + ((country == null) ? 0 : country.hashCode());
 		return result;
 	}
@@ -107,6 +120,8 @@ public class State implements Serializable {
 			if (other.stateUf != null)
 				return false;
 		} else if (!stateUf.equals(other.stateUf))
+			return false;
+		if (stateEnabled != other.stateEnabled)
 			return false;
 		if (country == null) {
 			if (other.country != null)
