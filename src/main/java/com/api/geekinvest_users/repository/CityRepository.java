@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.api.geekinvest_users.model.State;
+import com.api.geekinvest_users.model.CityModel;
 
-public interface StateRepositories extends JpaRepository<State, UUID> {
-	
+public interface CityRepository extends JpaRepository<CityModel, UUID> {
+    
 }

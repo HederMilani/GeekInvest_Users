@@ -44,14 +44,14 @@ public class User implements Serializable {
 	private State state;
 
 	@Column(nullable = false)
-	private City city;
+	private CityModel city;
 
 	public User() {
 		super();
 	}
 
 	public User(UUID id, String name, String email, String cpfCnpj, String address, Integer number, String codZip,
-			Country country, State state, City city) {
+			Country country, State state, CityModel city) {
 		super();
 
 		this.id = id;
@@ -138,11 +138,11 @@ public class User implements Serializable {
 		this.state = state;
 	}
 
-	public City getCity() {
+	public CityModel getCityModel() {
 		return city;
 	}
 
-	public void setCity(City city) {
+	public void setCityModel(CityModel city) {
 		this.city = city;
 	}
 

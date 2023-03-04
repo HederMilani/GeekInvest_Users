@@ -1,5 +1,6 @@
 package com.api.geekinvest_users.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,13 +14,13 @@ import com.api.geekinvest_users.repository.CountryRepositories;
 
 @Service
 public class CountryService {
-	
+
 	@Autowired
 	private CountryRepositories repository;
 
-	public Country save( Country country) {
+	public Country save(Country country) {
 		return repository.save(country);
-	}	
+	}
 
 	public boolean existsByCountryName(String nameCountry) {
 		return repository.existsByCountryName(nameCountry);
@@ -31,6 +32,10 @@ public class CountryService {
 
 	public Page<Country> findAll(Pageable pageable) {
 		return repository.findAll(pageable);
+	}
+
+	public List<Country> findAllByCountryEnable() {
+        return repository.findAllByCountryEnableTrue();
 	}
 
 	public Optional<Country> findById(UUID id) {

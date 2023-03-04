@@ -1,6 +1,7 @@
 package com.api.geekinvest_users.controller;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,7 +57,15 @@ public class CountryContoller {
 		if (objCountry.getCountryName() == null) {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
 					.body("Null: Country is required!");
-		} else if (service.existsByCountryName(objCountry.getCountryName())) {
+		}
+
+		if (service.existsByCountryName(objCountry.getCountryName())) {
+			Optional<Country> countryOptional = service.findByCountryName(objCountry.getCountryName());
+			if (!countryOptional.isPresent() || !countryOptional.get().isCountryEnabled()) {
+				return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
+						.body("Country Error! Contact the Administrator!");
+			}
+
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("Conflict: Country " + objCountry.getCountryName() + " already exists!");
 		}
@@ -64,13 +73,17 @@ public class CountryContoller {
 		if (objCountry.getSigla() == null) {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
 					.body("Null: Sigla is required");
-		} else if (objCountry.getSigla().length() > 3) {
+		}
+		if (objCountry.getSigla().length() > 3) {
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
 					.body("Not Validated: Acronym field must contain up to 3 characters!");
-		} else if (service.existsBySigla(objCountry.getSigla())) {
+		}
+		if (service.existsBySigla(objCountry.getSigla())) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("Conflict: Sigla " + objCountry.getSigla() + " already exists!");
 		}
+
+		objCountry.setCountryEnabled(true);
 
 		objCountry = service.save(objCountry);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -88,6 +101,11 @@ public class CountryContoller {
 			@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll(pageable));
 	}
+
+	@GetMapping(value = "/enabled")
+    public ResponseEntity<List<Country>> findAllByCountryEnable() {
+        return ResponseEntity.status(HttpStatus.OK).body(service.findAllByCountryEnable());
+    }
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Object> findById(@PathVariable(value = "id") UUID id) {
@@ -121,8 +139,10 @@ public class CountryContoller {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Country Not Found!");
 		}
 
-		service.delete(countryOptional.get());
+		countryOptional.get().setCountryEnabled(false);
+		service.save(countryOptional.get());
 
+		//TODO: Corrigir as filas do rabbitMQ service
 		rabbitMQService.sendCountry(RabbitMQConstant.QUEUE_COUNTRY_DELETE, countryOptional);
 
 		return ResponseEntity.status(HttpStatus.OK).body("Country deleted Successfully!");
@@ -151,6 +171,4 @@ public class CountryContoller {
 				.body(service.save(objCountry));
 	}
 
-	// TODO Adicionar função para enviar mensagem de atualização para todos os
-	// serviços que possuam Country
 }
