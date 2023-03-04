@@ -12,7 +12,7 @@ public class StateService {
     @Autowired
     private StateRepository stateRepository;
 
-    public void save(State state) {
-        stateRepository.save(state);
+    public State save(State state) {
+        return stateRepository.save(state);
     }
 }

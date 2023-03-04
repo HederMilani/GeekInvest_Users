@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.api</groupId>
-	<artifactId>geekinvest_users</artifactId>
+	<artifactId>artemis</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>geekinvest_users</name>
-	<description>Demo project for Spring Boot</description>
+	<name>artemis</name>
+	<description>Project register Users</description>
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2022.0.1</spring-cloud.version>
